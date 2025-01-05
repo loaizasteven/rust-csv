@@ -1,1 +1,0 @@
-searchState.loadedDescShard("sdk_usage", 0, "")
