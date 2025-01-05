@@ -1,0 +1,23 @@
+# Root Cargo.toml for the workspace
+[workspace]
+resolver = "2" # see https://doc.rust-lang.org/cargo/reference/resolver.html#feature-resolver-version-2
+members = [
+    "sdk",
+    "sdk_usage",
+    # Add more crates here as you expand
+]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Steven Loaiza"]
+repository = "https://github.com/loaizasteven/rust-csv"
+homepage = ""
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.83"
+
+[workspace.dependencies]
+# Add global dependencies used by all crates in the workspace
+
+[workspace.dependencies.sdk]
+path = "sdk/"
