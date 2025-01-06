@@ -5,7 +5,7 @@ pub mod stdin_parser;
 /// Function takes a vector of strings as input
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
-pub fn loader(args: Vec<String>) {
+pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
     let my_file = stdin_parser::argparser::parser(args);
     let csv_handler = reader::CsvMetadata{
         file: my_file.get("file").unwrap().to_string(),
@@ -15,7 +15,7 @@ pub fn loader(args: Vec<String>) {
         column_types: vec!["int".to_string(), "string".to_string()],
     };
     
-    return reader::csv_reader(&csv_handler);
+    return reader::csv_reader(&csv_handler)
 }
 
 /// This is a simple function that adds two numbers together
