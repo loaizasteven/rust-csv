@@ -6,9 +6,9 @@ pub mod stdin_parser;
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
 pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
-    let my_file = stdin_parser::argparser::parser(args);
+    let arg_mapping = stdin_parser::argparser::parser(args);
     let csv_handler = reader::CsvMetadata{
-        file: my_file.get("file").unwrap().to_string(),
+        file: arg_mapping.get("file").unwrap().to_string(),
         delimiter: ',',
         has_header: true,
         header: vec!["a".to_string(), "b".to_string()],
