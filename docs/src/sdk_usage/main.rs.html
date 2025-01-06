@@ -4,10 +4,16 @@
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
-<a href="#6" id="6">6</a></pre></div><pre class="rust"><code><span class="kw">use </span>sdk;
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a></pre></div><pre class="rust"><code><span class="kw">use </span>sdk;
 
-<span class="kw">fn </span>main() {
-    <span class="kw">let </span>result: u64 = sdk::add(<span class="number">2</span>, <span class="number">2</span>);
-    <span class="macro">println!</span>(<span class="string">"Result: {}"</span>, result);
+<span class="doccomment">/// Main function that calls the sdk loader function
+/// Function parse the command line arguments and calls the loader function
+/// The binary crate is used for local development and testing of the sdk library
+</span><span class="kw">fn </span>main() {
+    <span class="kw">let </span>args: Vec&lt;String&gt; = std::env::args().collect();
+    sdk::loader(args);
 }
 </code></pre></div></section></main></body></html>

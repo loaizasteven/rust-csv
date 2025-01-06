@@ -18,24 +18,54 @@
 <a href="#17" id="17">17</a>
 <a href="#18" id="18">18</a>
 <a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a></pre></div><pre class="rust"><code><span class="doccomment">/// This is a simple function that adds two numbers together
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a></pre></div><pre class="rust"><code><span class="doccomment">//! SDK for reading csv files efficiently from disk and providing command line argument parsing
+//! for data manipulation. Current functionality provides filtering of large csv files reducing the I/O overhead from
+//! high-level programming languages like Python
+//! 
+//! # Panics
+//! If the file path is not provided as a command line argument, a panic will result
+
+</span><span class="kw">pub mod </span>reader;
+<span class="kw">pub mod </span>stdin_parser;
+
+<span class="doccomment">/// Loader function that reads a csv file and returns a BufReader
 /// # Examples
-/// ```
-/// let result = sdk::add(2, 2);
-/// assert_eq!(result, 4);
-/// ```
-</span><span class="kw">pub fn </span>add(left: u64, right: u64) -&gt; u64 {
-    left + right
+/// See the sdk_usage crate for an example of how to use this function
+</span><span class="kw">pub fn </span>loader(args: Vec&lt;String&gt;) -&gt; std::io::BufReader&lt;std::fs::File&gt; {
+    <span class="kw">let </span>arg_mapping = stdin_parser::argparser::parser(args);
+    <span class="kw">let </span>csv_handler = reader::CsvMetadata{
+        file: arg_mapping.get(<span class="string">"file"</span>).unwrap().to_string(),
+        delimiter: <span class="string">','</span>,
+        has_header: <span class="bool-val">true</span>,
+        header: <span class="macro">vec!</span>[<span class="string">"a"</span>.to_string(), <span class="string">"b"</span>.to_string()],
+        column_types: <span class="macro">vec!</span>[<span class="string">"int"</span>.to_string(), <span class="string">"string"</span>.to_string()],
+    };
+    
+    <span class="kw">return </span>reader::csv_reader(<span class="kw-2">&amp;</span>csv_handler)
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="comment">// use super::*;
 
-    <span class="attr">#[test]
+    </span><span class="attr">#[test]
     </span><span class="kw">fn </span>it_works() {
-        <span class="kw">let </span>result = add(<span class="number">2</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(result, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="number">1</span>);
     }
 }
 </code></pre></div></section></main></body></html>

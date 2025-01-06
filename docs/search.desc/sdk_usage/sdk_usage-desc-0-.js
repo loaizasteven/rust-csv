@@ -1,1 +1,1 @@
-searchState.loadedDescShard("sdk_usage", 0, "")
+searchState.loadedDescShard("sdk_usage", 0, "Main function that calls the sdk loader function Function …")

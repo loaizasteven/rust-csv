@@ -1,8 +1,14 @@
+//! SDK for reading csv files efficiently from disk and providing command line argument parsing
+//! for data manipulation. Current functionality provides filtering of large csv files reducing the I/O overhead from
+//! high-level programming languages like Python
+//! 
+//! # Panics
+//! If the file path is not provided as a command line argument, a panic will result
+
 pub mod reader;
 pub mod stdin_parser;
 
 /// Loader function that reads a csv file and returns a BufReader
-/// Function takes a vector of strings as input
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
 pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {

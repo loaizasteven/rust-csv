@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["add"]};
+window.SIDEBAR_ITEMS = {"fn":["loader"],"mod":["reader","stdin_parser"]};

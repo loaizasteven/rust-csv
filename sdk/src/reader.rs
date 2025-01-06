@@ -1,8 +1,19 @@
-
+//! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
 use std::io::BufReader;
 use std::fs::File;
 
-/// CsvMetadata struct contains the metadata of the csv file
+/// A reader defines the struct containing metadata of the csv file
+/// # Example
+/// Build a CsvMetadata struct
+/// ```
+/// let csv_handler = reader::CsvMetadata{
+///    file: "/path/to/file.csv".to_string(),
+///   delimiter: ',',
+///  has_header: true,
+/// header: vec!["a".to_string(), "b".to_string()],
+/// column_types: vec!["int".to_string(), "string".to_string()],
+/// };
+/// ```
 pub struct CsvMetadata {
     pub file: String,
     pub delimiter: char,
@@ -11,7 +22,7 @@ pub struct CsvMetadata {
     pub column_types: Vec<String>,
 }
 
-/// Function csv_reader reads a csv file and returns a BufReader
+/// Reads a csv file and returns a `BufReader<File`
 pub fn csv_reader(csv_struct: &CsvMetadata) -> BufReader<File> {
     let f = File::open(&csv_struct.file).expect("Error opening file");
     BufReader::new(f)
