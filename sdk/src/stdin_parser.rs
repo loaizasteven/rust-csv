@@ -1,5 +1,12 @@
 use std::collections::HashMap;
 
+/// Module argparser contains a public function parser 
+/// The function parser() takes a vector of strings as input and returns a HashMap
+/// # Example
+/// ```
+/// let args: Vec<String> = vec!["my_program".to_string(), "--file".to_string(), "/path/to/file/".to_string()];
+/// let arg_mapping = sdk::stdin_parser::argparser::parser(args);
+/// ```
 pub mod argparser {
     use std::process::exit;
 
