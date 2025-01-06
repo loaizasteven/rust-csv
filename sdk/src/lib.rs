@@ -30,7 +30,6 @@ mod tests {
     #[test]
     fn it_works() {
         let result = add(2, 2);
-        _nothing();
         assert_eq!(result, 4);
     }
 }
