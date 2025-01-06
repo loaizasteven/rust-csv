@@ -1,1 +1,0 @@
-searchState.loadedDescShard("sdk", 0, "This is a simple function that adds two numbers together")
