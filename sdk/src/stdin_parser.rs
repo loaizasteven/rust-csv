@@ -20,7 +20,7 @@ pub mod argparser {
         let mut map = super::HashMap::new();
         for i in 1..args.len() {
             if i % 2 == 1 {
-                map.insert(args[i].strip_prefix("--").clone().unwrap().to_string(), args[i + 1].clone());
+                map.insert(args[i].strip_prefix("--").unwrap().to_string(), args[i + 1].clone());
             }
         }
         map
