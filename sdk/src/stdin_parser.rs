@@ -10,7 +10,7 @@ pub mod argparser {
                 println!("--file: Path to the file to be read");
                 exit(0);
             }
-            panic!("Runtime Panic: {} --file /path/to/file/ \n Help: {} <--help> for more details", args[0], args[0]);
+            panic!("\x1b[0;31mRuntime Panic:\x1b[0m {} --file /path/to/file/ \n \x1b[0;32mHelp:\x1b[0m {} <--help> for more details", args[0], args[0]);
         }
         return args
     }
