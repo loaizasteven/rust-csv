@@ -1,3 +1,18 @@
+pub mod reader;
+pub mod stdin_parser;
+
+pub fn loader(args: Vec<String>) {
+    let my_file = stdin_parser::argparser::parser(args);
+    let a = reader::CsvMetadata{
+        file: my_file.get("file").unwrap().to_string(),
+        delimiter: ',',
+        has_header: true,
+        header: vec!["a".to_string(), "b".to_string()],
+        column_types: vec!["int".to_string(), "string".to_string()],
+    };
+    let _ = reader::csv_reader(&a);
+}
+
 /// This is a simple function that adds two numbers together
 /// # Examples
 /// ```
@@ -15,6 +30,7 @@ mod tests {
     #[test]
     fn it_works() {
         let result = add(2, 2);
+        _nothing();
         assert_eq!(result, 4);
     }
 }
