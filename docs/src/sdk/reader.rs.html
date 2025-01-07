@@ -27,7 +27,8 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a></pre></div><pre class="rust"><code><span class="doccomment">//! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a></pre></div><pre class="rust"><code><span class="doccomment">//! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
 </span><span class="kw">use </span>std::io::BufReader;
 <span class="kw">use </span>std::fs::File;
 
@@ -35,12 +36,13 @@
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
-/// let csv_handler = reader::CsvMetadata{
+/// # use sdk::reader::CsvMetadata;
+/// let csv_handler = CsvMetadata{
 ///    file: "/path/to/file.csv".to_string(),
-///   delimiter: ',',
-///  has_header: true,
-/// header: vec!["a".to_string(), "b".to_string()],
-/// column_types: vec!["int".to_string(), "string".to_string()],
+///    delimiter: ',',
+///    has_header: true,
+///    header: vec!["a".to_string(), "b".to_string()],
+///    column_types: vec!["int".to_string(), "string".to_string()],
 /// };
 /// ```
 </span><span class="kw">pub struct </span>CsvMetadata {
