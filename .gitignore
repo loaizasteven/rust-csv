@@ -24,3 +24,6 @@ Cargo.lock
 .rustc_info.json
 .rustdoc_fingerprint.json
 doc/
+
+# Mac OS X Finder directory configuration files
+.DS_Store

@@ -6,12 +6,13 @@ use std::fs::File;
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
-/// let csv_handler = reader::CsvMetadata{
+/// # use sdk::reader::CsvMetadata;
+/// let csv_handler = CsvMetadata{
 ///    file: "/path/to/file.csv".to_string(),
-///   delimiter: ',',
-///  has_header: true,
-/// header: vec!["a".to_string(), "b".to_string()],
-/// column_types: vec!["int".to_string(), "string".to_string()],
+///    delimiter: ',',
+///    has_header: true,
+///    header: vec!["a".to_string(), "b".to_string()],
+///    column_types: vec!["int".to_string(), "string".to_string()],
 /// };
 /// ```
 pub struct CsvMetadata {
