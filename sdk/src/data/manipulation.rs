@@ -2,6 +2,7 @@
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use super::super::writer;
 
 /// Filtering module contains functions to filter data from a csv file
 pub mod filtering {
@@ -75,6 +76,7 @@ pub mod filtering {
                     Err(e) => eprintln!("Error reading line: {}", e),
                 }
             }
+            writer::csv_writer(String::from("test.csv"), writer.clone());
         }
         writer
     }
