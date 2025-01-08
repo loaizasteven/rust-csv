@@ -14,7 +14,7 @@ pub mod filtering {
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Vec<String> {
+    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Vec<Vec<String>> {
         let mut writer = Vec::new();
 
         for line in buffer.lines() {
@@ -22,7 +22,7 @@ pub mod filtering {
                 Ok(content) => {
                     // Split the line by commas and check if any field matches the query
                     if content.split(',').any(|field| field.trim() == query) {
-                        writer.push(content); // Add the whole line to the result
+                        writer.push(vec![content]); // Add the whole line to the result
                     }
                 }
                 Err(e) => eprintln!("Error reading line: {}", e),
@@ -40,8 +40,9 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, query: &str, column: &str) -> Vec<String> {
-        let mut writer = Vec::new();
+    pub fn filter(buffer: BufReader<File>, query: &str, column: &str) -> Vec<Vec<String>> {
+        use super::*;
+        let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
 
         for (index, line) in buffer.lines().enumerate() {
@@ -51,7 +52,10 @@ pub mod filtering {
                     Ok(header) => {
                         let col_option = header.split(',').position(|field| field.trim() == column);
                         match col_option {
-                            Some(col) => column_index = col,
+                            Some(col) => {
+                                column_index = col;
+                                writer.push(vec![header]); 
+                            },
                             None => {
                                 panic!("\x1b[0;31mRuntime Panic:\x1b[0m Column {} not found in the csv file", column);
                             }
@@ -65,7 +69,7 @@ pub mod filtering {
                         // Split the line by commas and check if any field matches the query
 
                         if content.split(',').nth(column_index).unwrap().trim() == query {
-                            writer.push(content); // Add the whole line to the result
+                            writer.push(vec![content]); // Add the whole line to the result
                         }
                     }
                     Err(e) => eprintln!("Error reading line: {}", e),
@@ -88,6 +92,6 @@ mod tests {
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
         let writer = filtering::filter(reader, "'1'", "val");
-        assert_eq!(writer, vec!["1,'1'"]);
+        assert_eq!(writer, vec![vec!["key,val"], vec!["1,'1'"]]);
     }
 }
