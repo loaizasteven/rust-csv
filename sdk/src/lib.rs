@@ -8,6 +8,7 @@
 pub mod reader;
 pub mod stdin_parser;
 pub mod data;
+pub mod writer;
 
 use data::manipulation;
 
@@ -25,7 +26,7 @@ pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
     };
 
     let reader = reader::csv_reader(&csv_handler);
-    let writer = manipulation::filtering::any_filter(reader, "1");
+    let writer = manipulation::filtering::filter(reader, "1", "key");
     println!("{:?}", writer);
     let reader = reader::csv_reader(&csv_handler);
 
