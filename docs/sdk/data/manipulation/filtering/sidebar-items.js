@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["any_filter"]};
+window.SIDEBAR_ITEMS = {"fn":["any_filter","filter"]};
