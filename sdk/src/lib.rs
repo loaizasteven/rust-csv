@@ -8,13 +8,16 @@
 pub mod reader;
 pub mod stdin_parser;
 pub mod data;
+pub mod writer;
+
+use std::io;
 
 use data::manipulation;
 
 /// Loader function that reads a csv file and returns a BufReader
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
-pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
+pub fn loader(args: Vec<String>) -> Result<(), io::Error> {
     let arg_mapping = stdin_parser::argparser::parser(args);
     let csv_handler = reader::CsvMetadata{
         file: arg_mapping.get("file").unwrap().to_string(),
@@ -25,11 +28,9 @@ pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
     };
 
     let reader = reader::csv_reader(&csv_handler);
-    let writer = manipulation::filtering::any_filter(reader, "1");
-    println!("{:?}", writer);
-    let reader = reader::csv_reader(&csv_handler);
+    let _ = manipulation::filtering::filter(reader, "1", "key", Some(String::from("test.csv")));
 
-    reader
+    return Ok(())
 }
 
 #[cfg(test)]

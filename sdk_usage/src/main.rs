@@ -5,5 +5,10 @@ use sdk;
 /// The binary crate is used for local development and testing of the sdk library
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    sdk::loader(args);
+    let results = sdk::loader(args);
+
+    match results {
+        Ok(_) => println!("\x1b[0;32mSuccess\x1b[0m"),
+        Err(e) => println!("\x1b[0;31mError\x1b[0m {}", e),
+    }
 }

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["loader"],"mod":["data","reader","stdin_parser"]};
+window.SIDEBAR_ITEMS = {"fn":["loader"],"mod":["data","reader","stdin_parser","writer"]};

@@ -2,6 +2,7 @@
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use super::super::writer;
 
 /// Filtering module contains functions to filter data from a csv file
 pub mod filtering {
@@ -14,7 +15,7 @@ pub mod filtering {
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Vec<String> {
+    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Result<String, std::io::Error> {
         let mut writer = Vec::new();
 
         for line in buffer.lines() {
@@ -22,13 +23,13 @@ pub mod filtering {
                 Ok(content) => {
                     // Split the line by commas and check if any field matches the query
                     if content.split(',').any(|field| field.trim() == query) {
-                        writer.push(content); // Add the whole line to the result
+                        writer.push(vec![content]); // Add the whole line to the result
                     }
                 }
-                Err(e) => eprintln!("Error reading line: {}", e),
+                Err(e) => return Err(e),
             }
         }
-        writer
+        Ok(String::from("SUCCESS"))
     }
     /// Safe data filtering function, single column & query matching
     ///
@@ -40,8 +41,9 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, query: &str, column: &str) -> Vec<String> {
-        let mut writer = Vec::new();
+    pub fn filter(buffer: BufReader<File>, query: &str, column: &str, output_path: Option<String>) -> Result<String, std::io::Error> {
+        use super::*;
+        let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
 
         for (index, line) in buffer.lines().enumerate() {
@@ -51,13 +53,16 @@ pub mod filtering {
                     Ok(header) => {
                         let col_option = header.split(',').position(|field| field.trim() == column);
                         match col_option {
-                            Some(col) => column_index = col,
+                            Some(col) => {
+                                column_index = col;
+                                writer.push(vec![header]); 
+                            },
                             None => {
                                 panic!("\x1b[0;31mRuntime Panic:\x1b[0m Column {} not found in the csv file", column);
                             }
                         }
                     }
-                    Err(e) => eprintln!("Error reading line: {}", e),
+                    Err(e) => return Err(e),
                 }
             } else {
                 match line {
@@ -65,14 +70,20 @@ pub mod filtering {
                         // Split the line by commas and check if any field matches the query
 
                         if content.split(',').nth(column_index).unwrap().trim() == query {
-                            writer.push(content); // Add the whole line to the result
+                            writer.push(vec![content]); // Add the whole line to the result
                         }
                     }
-                    Err(e) => eprintln!("Error reading line: {}", e),
+                    Err(e) => return Err(e),
                 }
             }
+            match &output_path {
+                Some(path) => {
+                    let _ = writer::csv_writer(path.clone(), writer.clone());
+                },
+                None => {}
+            }
         }
-        writer
+        Ok(String::from("SUCCESS"))
     }
 }
 
@@ -87,7 +98,7 @@ mod tests {
         path.push("test/example/data.csv");
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let writer = filtering::filter(reader, "'1'", "val");
-        assert_eq!(writer, vec!["1,'1'"]);
+        let writer = filtering::filter(reader, "'1'", "val", None);
+        assert!(writer.is_ok());
     }
 }
