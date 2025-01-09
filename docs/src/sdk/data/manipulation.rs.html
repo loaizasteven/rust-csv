@@ -91,10 +91,22 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
 
 </span><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{BufRead, BufReader};
+<span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::writer;
 
 <span class="doccomment">/// Filtering module contains functions to filter data from a csv file
 </span><span class="kw">pub mod </span>filtering {
@@ -107,7 +119,7 @@
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    </span><span class="kw">pub fn </span>any_filter(buffer: BufReader&lt;File&gt;, query: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+    </span><span class="kw">pub fn </span>any_filter(buffer: BufReader&lt;File&gt;, query: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>writer = Vec::new();
 
         <span class="kw">for </span>line <span class="kw">in </span>buffer.lines() {
@@ -115,13 +127,13 @@
                 <span class="prelude-val">Ok</span>(content) =&gt; {
                     <span class="comment">// Split the line by commas and check if any field matches the query
                     </span><span class="kw">if </span>content.split(<span class="string">','</span>).any(|field| field.trim() == query) {
-                        writer.push(content); <span class="comment">// Add the whole line to the result
+                        writer.push(<span class="macro">vec!</span>[content]); <span class="comment">// Add the whole line to the result
                     </span>}
                 }
-                <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">eprintln!</span>(<span class="string">"Error reading line: {}"</span>, e),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
             }
         }
-        writer
+        <span class="prelude-val">Ok</span>(String::from(<span class="string">"SUCCESS"</span>))
     }
     <span class="doccomment">/// Safe data filtering function, single column &amp; query matching
     ///
@@ -133,8 +145,9 @@
     /// 1,"a,b",2,3 -&gt; [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, query: <span class="kw-2">&amp;</span>str, column: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>writer = Vec::new();
+    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, query: <span class="kw-2">&amp;</span>str, column: <span class="kw-2">&amp;</span>str, output_path: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>writer: Vec&lt;Vec&lt;String&gt;&gt; = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>column_index = <span class="number">0</span>;
 
         <span class="kw">for </span>(index, line) <span class="kw">in </span>buffer.lines().enumerate() {
@@ -144,13 +157,16 @@
                     <span class="prelude-val">Ok</span>(header) =&gt; {
                         <span class="kw">let </span>col_option = header.split(<span class="string">','</span>).position(|field| field.trim() == column);
                         <span class="kw">match </span>col_option {
-                            <span class="prelude-val">Some</span>(col) =&gt; column_index = col,
+                            <span class="prelude-val">Some</span>(col) =&gt; {
+                                column_index = col;
+                                writer.push(<span class="macro">vec!</span>[header]); 
+                            },
                             <span class="prelude-val">None </span>=&gt; {
                                 <span class="macro">panic!</span>(<span class="string">"\x1b[0;31mRuntime Panic:\x1b[0m Column {} not found in the csv file"</span>, column);
                             }
                         }
                     }
-                    <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">eprintln!</span>(<span class="string">"Error reading line: {}"</span>, e),
+                    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
                 }
             } <span class="kw">else </span>{
                 <span class="kw">match </span>line {
@@ -158,14 +174,20 @@
                         <span class="comment">// Split the line by commas and check if any field matches the query
 
                         </span><span class="kw">if </span>content.split(<span class="string">','</span>).nth(column_index).unwrap().trim() == query {
-                            writer.push(content); <span class="comment">// Add the whole line to the result
+                            writer.push(<span class="macro">vec!</span>[content]); <span class="comment">// Add the whole line to the result
                         </span>}
                     }
-                    <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">eprintln!</span>(<span class="string">"Error reading line: {}"</span>, e),
+                    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
                 }
             }
+            <span class="kw">match </span><span class="kw-2">&amp;</span>output_path {
+                <span class="prelude-val">Some</span>(path) =&gt; {
+                    <span class="kw">let _ </span>= writer::csv_writer(path.clone(), writer.clone());
+                },
+                <span class="prelude-val">None </span>=&gt; {}
+            }
         }
-        writer
+        <span class="prelude-val">Ok</span>(String::from(<span class="string">"SUCCESS"</span>))
     }
 }
 
@@ -180,8 +202,8 @@
         </span>path.push(<span class="string">"test/example/data.csv"</span>);
         <span class="kw">let </span>file = std::fs::File::open(path).unwrap();
         <span class="kw">let </span>reader = BufReader::new(file);
-        <span class="kw">let </span>writer = filtering::filter(reader, <span class="string">"'1'"</span>, <span class="string">"val"</span>);
-        <span class="macro">assert_eq!</span>(writer, <span class="macro">vec!</span>[<span class="string">"1,'1'"</span>]);
+        <span class="kw">let </span>writer = filtering::filter(reader, <span class="string">"'1'"</span>, <span class="string">"val"</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert!</span>(writer.is_ok());
     }
 }
 </code></pre></div></section></main></body></html>

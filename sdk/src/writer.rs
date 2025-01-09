@@ -1,6 +1,9 @@
 use std::io::Write;
 use std::fs::File;
-
+/// Function to write a csv file to disk
+/// 
+/// # TODO:
+/// When writing the file, the function includes a newline character at the EOF. 
 pub fn csv_writer(output_path: String, writer: Vec<Vec<String>>) -> Result<String, std::io::Error> {
     let file = File::create(output_path);
     match file {
