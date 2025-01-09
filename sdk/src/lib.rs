@@ -26,7 +26,7 @@ pub fn loader(args: Vec<String>) -> std::io::BufReader<std::fs::File> {
     };
 
     let reader = reader::csv_reader(&csv_handler);
-    let writer = manipulation::filtering::filter(reader, "1", "key");
+    let writer = manipulation::filtering::filter(reader, "1", "key", Some(String::from("test.csv")));
     println!("{:?}", writer);
     let reader = reader::csv_reader(&csv_handler);
 

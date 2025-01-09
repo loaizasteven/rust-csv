@@ -41,7 +41,7 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, query: &str, column: &str) -> Vec<Vec<String>> {
+    pub fn filter(buffer: BufReader<File>, query: &str, column: &str, output_path: Option<String>) -> Vec<Vec<String>> {
         use super::*;
         let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
@@ -76,7 +76,12 @@ pub mod filtering {
                     Err(e) => eprintln!("Error reading line: {}", e),
                 }
             }
-            writer::csv_writer(String::from("test.csv"), writer.clone());
+            match &output_path {
+                Some(path) => {
+                    writer::csv_writer(path.clone(), writer.clone());
+                },
+                None => {}
+            }
         }
         writer
     }
@@ -93,7 +98,7 @@ mod tests {
         path.push("test/example/data.csv");
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let writer = filtering::filter(reader, "'1'", "val");
+        let writer = filtering::filter(reader, "'1'", "val", None);
         assert_eq!(writer, vec![vec!["key,val"], vec!["1,'1'"]]);
     }
 }
