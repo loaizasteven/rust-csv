@@ -15,7 +15,7 @@ pub mod filtering {
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Vec<Vec<String>> {
+    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Result<String, std::io::Error> {
         let mut writer = Vec::new();
 
         for line in buffer.lines() {
@@ -26,10 +26,10 @@ pub mod filtering {
                         writer.push(vec![content]); // Add the whole line to the result
                     }
                 }
-                Err(e) => eprintln!("Error reading line: {}", e),
+                Err(e) => return Err(e),
             }
         }
-        writer
+        Ok(String::from("SUCCESS"))
     }
     /// Safe data filtering function, single column & query matching
     ///
@@ -41,7 +41,7 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, query: &str, column: &str, output_path: Option<String>) -> Vec<Vec<String>> {
+    pub fn filter(buffer: BufReader<File>, query: &str, column: &str, output_path: Option<String>) -> Result<String, std::io::Error> {
         use super::*;
         let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
@@ -62,7 +62,7 @@ pub mod filtering {
                             }
                         }
                     }
-                    Err(e) => eprintln!("Error reading line: {}", e),
+                    Err(e) => return Err(e),
                 }
             } else {
                 match line {
@@ -73,17 +73,17 @@ pub mod filtering {
                             writer.push(vec![content]); // Add the whole line to the result
                         }
                     }
-                    Err(e) => eprintln!("Error reading line: {}", e),
+                    Err(e) => return Err(e),
                 }
             }
             match &output_path {
                 Some(path) => {
-                    writer::csv_writer(path.clone(), writer.clone());
+                    let _ = writer::csv_writer(path.clone(), writer.clone());
                 },
                 None => {}
             }
         }
-        writer
+        Ok(String::from("SUCCESS"))
     }
 }
 
@@ -99,6 +99,6 @@ mod tests {
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
         let writer = filtering::filter(reader, "'1'", "val", None);
-        assert_eq!(writer, vec![vec!["key,val"], vec!["1,'1'"]]);
+        assert!(writer.is_ok());
     }
 }

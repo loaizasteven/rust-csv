@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::fs::File;
 
-pub fn csv_writer(output_path: String, writer: Vec<Vec<String>>) {
+pub fn csv_writer(output_path: String, writer: Vec<Vec<String>>) -> Result<String, std::io::Error> {
     let file = File::create(output_path);
     match file {
         Ok(mut obj) => {
@@ -12,6 +12,7 @@ pub fn csv_writer(output_path: String, writer: Vec<Vec<String>>) {
                 println!("DONE")
         }
         },
-        Err(e) => eprintln!("Error creating file: {}", e),
+        Err(e) => return Err(e),
     }
+    Ok(String::from("SUCCESS"))
 }
