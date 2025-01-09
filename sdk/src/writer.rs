@@ -1,4 +1,4 @@
-//! Provdes [csv_writer] function to write a csv file to disk
+//! Provides [csv_writer] function to write a csv file to disk
 use std::io::Write;
 use std::fs::File;
 
