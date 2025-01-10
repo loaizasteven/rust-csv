@@ -1,6 +1,7 @@
 //! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
 use std::io::BufReader;
 use std::fs::File;
+use clap::Parser;
 
 /// A reader defines the struct containing metadata of the csv file
 /// # Example
@@ -15,11 +16,19 @@ use std::fs::File;
 ///    column_types: vec!["int".to_string(), "string".to_string()],
 /// };
 /// ```
+
+/// Search for a pattern in a file and display the lines that contain it.
+#[derive(Parser, Debug)]
 pub struct CsvMetadata {
+    #[clap(long)]
     pub file: String,
+    #[clap(long)]
     pub delimiter: char,
+    #[clap(long, action)]
     pub has_header: bool,
+    #[clap(long, value_delimiter= ',')]
     pub header: Vec<String>,
+    #[clap(long, value_delimiter= ',')]
     pub column_types: Vec<String>,
 }
 
