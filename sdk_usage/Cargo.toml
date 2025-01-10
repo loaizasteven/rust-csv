@@ -1,7 +1,0 @@
-[package]
-name = "sdk_usage"
-version = { workspace = true }
-edition = "2021"
-
-[dependencies]
-sdk = { workspace = true }
