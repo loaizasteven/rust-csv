@@ -17,18 +17,9 @@ use data::manipulation;
 /// Loader function that reads a csv file and returns a BufReader
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
-pub fn loader(args: Vec<String>) -> Result<(), io::Error> {
-    let arg_mapping = stdin_parser::argparser::parser(args);
-    let csv_handler = reader::CsvMetadata{
-        file: arg_mapping.get("file").unwrap().to_string(),
-        delimiter: ',',
-        has_header: true,
-        header: vec!["a".to_string(), "b".to_string()],
-        column_types: vec!["int".to_string(), "string".to_string()],
-    };
-
+pub fn loader(csv_handler: reader::CsvMetadata) -> Result<(), io::Error> {
     let reader = reader::csv_reader(&csv_handler);
-    let _ = manipulation::filtering::filter(reader, "1", "key", Some(String::from("test.csv")));
+    let _ = manipulation::filtering::filter(reader, &csv_handler);
 
     return Ok(())
 }

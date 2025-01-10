@@ -1,10 +1,9 @@
 # Root Cargo.toml for the workspace
 [workspace]
 resolver = "2" # see https://doc.rust-lang.org/cargo/reference/resolver.html#feature-resolver-version-2
-members = [
+members = [ 
+    "cli",
     "sdk",
-    "sdk_usage",
-    # Add more crates here as you expand
 ]
 
 [workspace.package]
@@ -18,6 +17,7 @@ rust-version = "1.83"
 
 [workspace.dependencies]
 # Add global dependencies used by all crates in the workspace
+clap = { version = "4.0", features = ["derive"] }
 
 [workspace.dependencies.sdk]
 path = "sdk/"

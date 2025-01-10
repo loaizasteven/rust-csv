@@ -1,26 +1,41 @@
 //! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
 use std::io::BufReader;
 use std::fs::File;
+use clap::Parser;
 
 /// A reader defines the struct containing metadata of the csv file
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
 /// # use sdk::reader::CsvMetadata;
-/// let csv_handler = CsvMetadata{
-///    file: "/path/to/file.csv".to_string(),
-///    delimiter: ',',
-///    has_header: true,
-///    header: vec!["a".to_string(), "b".to_string()],
-///    column_types: vec!["int".to_string(), "string".to_string()],
+/// let metadata = CsvMetadata {
+///     file: "/path/to/file.csv".to_string(),
+///     delimiter: ',',
+///     has_header: true,
+///     column_types: vec!["string".to_string()],
+///     query: "".to_string(),
+///     column: "".to_string(),
+///     output_path: None,
 /// };
 /// ```
+
+/// Search for a pattern in a file and display the lines that contain it.
+#[derive(Parser, Debug)]
 pub struct CsvMetadata {
+    #[clap(long)]
     pub file: String,
+    #[clap(long, default_value = ",")]
     pub delimiter: char,
+    #[clap(long, action)]
     pub has_header: bool,
-    pub header: Vec<String>,
+    #[clap(long, value_delimiter= ',', default_value = "string")]
     pub column_types: Vec<String>,
+    #[clap(long, default_value = "")]
+    pub query: String,
+    #[clap(long, default_value = "")]
+    pub column: String,
+    #[clap(long, default_value = None)]
+    pub output_path: Option<String>,
 }
 
 /// Reads a csv file and returns a `BufReader<File`

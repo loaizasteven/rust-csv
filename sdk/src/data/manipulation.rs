@@ -3,6 +3,7 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use super::super::writer;
+use super::super::reader::CsvMetadata;
 
 /// Filtering module contains functions to filter data from a csv file
 pub mod filtering {
@@ -41,10 +42,15 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, query: &str, column: &str, output_path: Option<String>) -> Result<String, std::io::Error> {
+    pub fn filter(buffer: BufReader<File>, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
         use super::*;
         let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
+        let column = &csv_struct.column;
+        println!("Column: {}", column);
+        let query = &csv_struct.query;
+        println!("Query: {}", query);
+        let output_path = &csv_struct.output_path;
 
         for (index, line) in buffer.lines().enumerate() {
             if index == 0 {
@@ -96,9 +102,18 @@ mod tests {
     fn test_filtering() {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")); //crate root
         path.push("test/example/data.csv");
+        let csv_handler = CsvMetadata {
+            file: path.to_str().unwrap().to_string(),
+            delimiter: ',',
+            has_header: true,
+            column_types: vec!["string".to_string()],
+            query: '1'.to_string(),
+            column: "val".to_string(),
+            output_path: None,
+        };
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let writer = filtering::filter(reader, "'1'", "val", None);
+        let writer = filtering::filter(reader, &csv_handler);
         assert!(writer.is_ok());
     }
 }
