@@ -1,11 +1,34 @@
-matrix:
-  # MinGW
-  - TARGET: i686-pc-windows-gnu
-  - TARGET: x86_64-pc-windows-gnu
+environment:
+  global:
+  # TODO This is the Rust channel that build jobs will use by default but can be
+  # overridden on a case by case basis down below
+    RUST_VERSION: stable
 
-  # MSVC
-  - TARGET: i686-pc-windows-msvc
-  - TARGET: x86_64-pc-windows-msvc
+    CRATE_NAME: rust-csv
+
+  # TODO These are all the build jobs. Adjust as necessary. Comment out what you
+  # don't need
+  matrix:
+    # MinGW
+    - TARGET: i686-pc-windows-gnu
+    - TARGET: x86_64-pc-windows-gnu
+
+    # MSVC
+    - TARGET: i686-pc-windows-msvc
+    - TARGET: x86_64-pc-windows-msvc
+
+install:
+  - ps: >-
+      If ($env:TARGET -eq 'x86_64-pc-windows-gnu') {
+        $env:PATH += ';C:\msys64\mingw64\bin'
+      } ElseIf ($env:TARGET -eq 'i686-pc-windows-gnu') {
+        $env:PATH += ';C:\msys64\mingw32\bin'
+      }
+  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
+  - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_VERSION%
+  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - rustc -Vv
+  - cargo -V
 
 build_script:
   - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
