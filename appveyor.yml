@@ -1,0 +1,31 @@
+matrix:
+  # MinGW
+  - TARGET: i686-pc-windows-gnu
+  - TARGET: x86_64-pc-windows-gnu
+
+  # MSVC
+  - TARGET: i686-pc-windows-msvc
+  - TARGET: x86_64-pc-windows-msvc
+
+build_script:
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  - source $HOME/.cargo/env
+  - cargo build --release --bin cli
+
+artifacts:
+  - path: target/%TARGET%/release/cli.exe
+    name: cli-%TARGET%.exe
+  - path: target/release/cli
+    name: cli-%TARGET%.exe
+
+deploy:
+  provider: GitHub
+  artifact: cli-%TARGET%.exe, cli-%TARGET%
+  auth_token:
+    secure: RwzqvhGNJJ8/bUJ2xh93kmtR0EunmwViXIbjs/WaZKm4GEu0FmE4CzXeZ4dQtZTz
+  draft: true
+  prerelease: false
+  on:
+    branch: main
+    event: push
+    tags: true
