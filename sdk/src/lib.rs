@@ -19,7 +19,7 @@ use data::manipulation;
 /// See the sdk_usage crate for an example of how to use this function
 pub fn loader(csv_handler: reader::CsvMetadata) -> Result<(), io::Error> {
     let reader = reader::csv_reader(&csv_handler);
-    let _ = manipulation::filtering::filter(reader, "1", "key", Some(String::from("test.csv")));
+    let _ = manipulation::filtering::filter(reader, &csv_handler);
 
     return Ok(())
 }

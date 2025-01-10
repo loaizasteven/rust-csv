@@ -8,12 +8,14 @@ use clap::Parser;
 /// Build a CsvMetadata struct
 /// ```
 /// # use sdk::reader::CsvMetadata;
-/// let csv_handler = CsvMetadata{
-///    file: "/path/to/file.csv".to_string(),
-///    delimiter: ',',
-///    has_header: true,
-///    header: vec!["a".to_string(), "b".to_string()],
-///    column_types: vec!["int".to_string(), "string".to_string()],
+/// let metadata = CsvMetadata {
+///     file: "/path/to/file.csv".to_string(),
+///     delimiter: ',',
+///     has_header: true,
+///     column_types: vec!["string".to_string()],
+///     query: "".to_string(),
+///     column: "".to_string(),
+///     output_path: None,
 /// };
 /// ```
 
@@ -22,14 +24,18 @@ use clap::Parser;
 pub struct CsvMetadata {
     #[clap(long)]
     pub file: String,
-    #[clap(long)]
+    #[clap(long, default_value = ",")]
     pub delimiter: char,
     #[clap(long, action)]
     pub has_header: bool,
-    #[clap(long, value_delimiter= ',')]
-    pub header: Vec<String>,
-    #[clap(long, value_delimiter= ',')]
+    #[clap(long, value_delimiter= ',', default_value = "string")]
     pub column_types: Vec<String>,
+    #[clap(long, default_value = "")]
+    pub query: String,
+    #[clap(long, default_value = "")]
+    pub column: String,
+    #[clap(long, default_value = None)]
+    pub output_path: Option<String>,
 }
 
 /// Reads a csv file and returns a `BufReader<File`
