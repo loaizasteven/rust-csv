@@ -45,6 +45,7 @@ after_build:
   - cargo -V
 
 deploy:
+  provider: GitHub
   auth_token:
     secure: $(APP_VEYOR_TOKEN) 
     draft: false
