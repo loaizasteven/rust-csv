@@ -47,7 +47,7 @@ after_build:
 deploy:
   provider: GitHub
   auth_token:
-    secure: $(APP_VEYOR_TOKEN) 
+    secure: ${{ secrets.APP_VEYOR_TOKEN }}
   draft: false
   tag: $(version)
   prerelease: true
