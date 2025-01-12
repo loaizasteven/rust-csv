@@ -3,7 +3,7 @@ use std::io::BufReader;
 use std::fs::File;
 use clap::Parser;
 
-/// A reader defines the struct containing metadata of the csv file
+/// A reader module defines the struct containing metadata of the csv file
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
@@ -19,8 +19,8 @@ use clap::Parser;
 /// };
 /// ```
 
-/// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser, Debug)]
+#[clap(about = "CLI tool to read csv files and perform filtering operations")]
 pub struct CsvMetadata {
     #[clap(long)]
     pub file: String,
