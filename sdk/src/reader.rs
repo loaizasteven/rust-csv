@@ -19,8 +19,8 @@ use clap::Parser;
 /// };
 /// ```
 
-/// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser, Debug)]
+#[clap(about = "CLI tool to read csv files and perform filtering operations")]
 pub struct CsvMetadata {
     #[clap(long)]
     pub file: String,
