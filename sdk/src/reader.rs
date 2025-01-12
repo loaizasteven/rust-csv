@@ -23,7 +23,7 @@ pub struct CsvMetadata {
     pub file: String,
     #[clap(long, default_value = ",")]
     pub delimiter: char,
-    #[clap(long, action)]
+    #[clap(long, action, default_value = "true")]
     pub has_header: bool,
     #[clap(long, value_delimiter= ',', default_value = "string")]
     pub column_types: Vec<String>,
