@@ -3,7 +3,7 @@ use std::io::BufReader;
 use std::fs::File;
 use clap::Parser;
 
-/// A reader defines the struct containing metadata of the csv file
+/// A reader module defines the struct containing metadata of the csv file
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
