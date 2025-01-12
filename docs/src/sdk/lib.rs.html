@@ -33,16 +33,7 @@
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-<a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a></pre></div><pre class="rust"><code><span class="doccomment">//! SDK for reading csv files efficiently from disk and providing command line argument parsing
+<a href="#35" id="35">35</a></pre></div><pre class="rust"><code><span class="doccomment">//! SDK for reading csv files efficiently from disk and providing command line argument parsing
 //! for data manipulation. Current functionality provides filtering of large csv files reducing the I/O overhead from
 //! high-level programming languages like Python
 //! 
@@ -61,18 +52,9 @@
 <span class="doccomment">/// Loader function that reads a csv file and returns a BufReader
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
-</span><span class="kw">pub fn </span>loader(args: Vec&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
-    <span class="kw">let </span>arg_mapping = stdin_parser::argparser::parser(args);
-    <span class="kw">let </span>csv_handler = reader::CsvMetadata{
-        file: arg_mapping.get(<span class="string">"file"</span>).unwrap().to_string(),
-        delimiter: <span class="string">','</span>,
-        has_header: <span class="bool-val">true</span>,
-        header: <span class="macro">vec!</span>[<span class="string">"a"</span>.to_string(), <span class="string">"b"</span>.to_string()],
-        column_types: <span class="macro">vec!</span>[<span class="string">"int"</span>.to_string(), <span class="string">"string"</span>.to_string()],
-    };
-
+</span><span class="kw">pub fn </span>loader(csv_handler: reader::CsvMetadata) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
     <span class="kw">let </span>reader = reader::csv_reader(<span class="kw-2">&amp;</span>csv_handler);
-    <span class="kw">let _ </span>= manipulation::filtering::filter(reader, <span class="string">"1"</span>, <span class="string">"key"</span>, <span class="prelude-val">Some</span>(String::from(<span class="string">"test.csv"</span>)));
+    <span class="kw">let _ </span>= manipulation::filtering::filter(reader, <span class="kw-2">&amp;</span>csv_handler);
 
     <span class="kw">return </span><span class="prelude-val">Ok</span>(())
 }

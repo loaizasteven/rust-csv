@@ -102,11 +102,27 @@
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
 
 </span><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{BufRead, BufReader};
 <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::writer;
+<span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::reader::CsvMetadata;
 
 <span class="doccomment">/// Filtering module contains functions to filter data from a csv file
 </span><span class="kw">pub mod </span>filtering {
@@ -145,10 +161,15 @@
     /// 1,"a,b",2,3 -&gt; [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, query: <span class="kw-2">&amp;</span>str, column: <span class="kw-2">&amp;</span>str, output_path: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
+    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, csv_struct: <span class="kw-2">&amp;</span>CsvMetadata) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>writer: Vec&lt;Vec&lt;String&gt;&gt; = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>column_index = <span class="number">0</span>;
+        <span class="kw">let </span>column = <span class="kw-2">&amp;</span>csv_struct.column;
+        <span class="macro">println!</span>(<span class="string">"Column: {}"</span>, column);
+        <span class="kw">let </span>query = <span class="kw-2">&amp;</span>csv_struct.query;
+        <span class="macro">println!</span>(<span class="string">"Query: {}"</span>, query);
+        <span class="kw">let </span>output_path = <span class="kw-2">&amp;</span>csv_struct.output_path;
 
         <span class="kw">for </span>(index, line) <span class="kw">in </span>buffer.lines().enumerate() {
             <span class="kw">if </span>index == <span class="number">0 </span>{
@@ -200,9 +221,18 @@
     </span><span class="kw">fn </span>test_filtering() {
         <span class="kw">let </span><span class="kw-2">mut </span>path = PathBuf::from(<span class="macro">env!</span>(<span class="string">"CARGO_MANIFEST_DIR"</span>)); <span class="comment">//crate root
         </span>path.push(<span class="string">"test/example/data.csv"</span>);
+        <span class="kw">let </span>csv_handler = CsvMetadata {
+            file: path.to_str().unwrap().to_string(),
+            delimiter: <span class="string">','</span>,
+            has_header: <span class="bool-val">true</span>,
+            column_types: <span class="macro">vec!</span>[<span class="string">"string"</span>.to_string()],
+            query: <span class="string">'1'</span>.to_string(),
+            column: <span class="string">"val"</span>.to_string(),
+            output_path: <span class="prelude-val">None</span>,
+        };
         <span class="kw">let </span>file = std::fs::File::open(path).unwrap();
         <span class="kw">let </span>reader = BufReader::new(file);
-        <span class="kw">let </span>writer = filtering::filter(reader, <span class="string">"'1'"</span>, <span class="string">"val"</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>writer = filtering::filter(reader, <span class="kw-2">&amp;</span>csv_handler);
         <span class="macro">assert!</span>(writer.is_ok());
     }
 }
