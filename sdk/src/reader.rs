@@ -20,7 +20,7 @@ use clap::Parser;
 /// ```
 
 #[derive(Parser, Debug)]
-#[clap(about = "CLI tool to read csv files and perform filtering operations")]
+#[clap(about = "CSV constructur")]
 pub struct CsvMetadata {
     #[clap(long)]
     pub file: String,
