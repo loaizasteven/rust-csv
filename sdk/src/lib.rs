@@ -17,19 +17,36 @@ use data::manipulation;
 /// Loader function that reads a csv file and returns a BufReader
 /// # Examples
 /// See the sdk_usage crate for an example of how to use this function
-pub fn loader(csv_handler: reader::CsvMetadata) -> Result<(), io::Error> {
+pub fn loader(csv_handler: reader::CsvMetadata, filter_command: manipulation::Command) -> Result<(), io::Error> {
     let reader = reader::csv_reader(&csv_handler);
-    let _ = manipulation::filtering::filter(reader, &csv_handler);
+    let _ = manipulation::filtering::filter(reader, &filter_command, &csv_handler);
 
     return Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
+    use std::path::PathBuf;
 
     #[test]
-    fn it_works() {
-        assert_eq!(1, 1);
+    fn test_loader() {
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")); //crate root
+        path.push("test/example/data.csv");
+        let csv_handler = reader::CsvMetadata {
+            file: path.to_str().unwrap().to_string(),
+            delimiter: ',',
+            has_header: true,
+            column_types: vec!["string".to_string()]
+        };
+        let filter_command = data::manipulation::Command {
+            query: "1".to_string(),
+            column: "key".to_string(),
+            output_path: None,
+            subcommand: data::manipulation::Subcommand::Filter(csv_handler.clone())
+        };
+        let result = super::loader(csv_handler, filter_command);
+        assert!(result.is_ok());
     }
+
 }
