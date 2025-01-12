@@ -23,6 +23,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: gh-pages/deploy@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GHPAGES_TOKEN }}
           deploy_branch: gh-pages
           build_dir: target/doc
