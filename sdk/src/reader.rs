@@ -12,10 +12,7 @@ use clap::Parser;
 ///     file: "/path/to/file.csv".to_string(),
 ///     delimiter: ',',
 ///     has_header: true,
-///     column_types: vec!["string".to_string()],
-///     query: "".to_string(),
-///     column: "".to_string(),
-///     output_path: None,
+///     column_types: vec!["string".to_string()]
 /// };
 /// ```
 
@@ -30,12 +27,18 @@ pub struct CsvMetadata {
     pub has_header: bool,
     #[clap(long, value_delimiter= ',', default_value = "string")]
     pub column_types: Vec<String>,
-    #[clap(long, default_value = "")]
-    pub query: String,
-    #[clap(long, default_value = "")]
-    pub column: String,
-    #[clap(long, default_value = None)]
-    pub output_path: Option<String>,
+}
+
+impl CsvMetadata {
+    /// Returns the clone of the CsvMetadata struct
+    pub fn clone(&self) -> CsvMetadata {
+        CsvMetadata {
+            file: self.file.clone(),
+            delimiter: self.delimiter,
+            has_header: self.has_header,
+            column_types: self.column_types.clone()
+        }
+    }
 }
 
 /// Reads a csv file and returns a `BufReader<File`
