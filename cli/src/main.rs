@@ -1,4 +1,4 @@
-//! The CLI binary file is intended to be used by non-rustcean developers to interact with the rust-csv library.
+//! The CLI binary file is intended to be used by non-Rustaceans developers to interact with the rust-csv library.
 //! Specifically written for Data Scientist and Data Engineers using high-level programming languages such as Python or R.
 //! The CLI tool will allow users to read csv files and perform filtering operations, such as filtering by a specific column and query.
 //! This simple tool will reduct the I/O overhead of reading csv files and filtering data, reducing the time spent on data preprocessing.
