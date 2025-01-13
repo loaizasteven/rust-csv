@@ -30,7 +30,7 @@ pub struct CsvMetadata {
 }
 
 impl CsvMetadata {
-    /// Returns the clone of the CsvMetadata struct
+    /// Instanstiate `self` and return clone of the CsvMetadata struct
     pub fn clone(&self) -> CsvMetadata {
         CsvMetadata {
             file: self.file.clone(),

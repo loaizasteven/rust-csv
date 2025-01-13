@@ -20,5 +20,27 @@ When pushing the code to the repo, use the following bash script as a wrapper fo
 ```bash
 bash cargo_docs_shortcut.sh
 ```
+
+## TODO
+- Add documentation to additional struct/enums
+- Add descriptions for commands/sub-commands in cli tool
+- Support for multi filtering
+- Warning when filtering causes empty csv - No output / Force output command
+- Add read me for use of cli (non-rust users)
+- shell script for users to download cli tool for local development (via `curl`)
+  - download latest binary release
+  - Add logging with welcome msg and example usage
+  - mv binary to /usr/.local/bin
+- redesign of cli args, current initial command takes cli args and subcommand additional cli args. 
+```bash
+./cli transform \
+        --query "'1'" \
+        --column "val" \
+        --output-path "./test.csv" \
+      filter \
+        --file "../sdk/test/example/data.csv"
+```
+- change println to logging instead.
+
 ## License
 This project is licensed under the Apache-2.0 License. See the [LICENSE](LICENSE) file for details.

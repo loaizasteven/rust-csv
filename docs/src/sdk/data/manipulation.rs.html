@@ -117,12 +117,69 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a></pre></div><pre class="rust"><code><span class="doccomment">//! Data Manipulation modules and functionalities
 
 </span><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{BufRead, BufReader};
 <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::writer;
 <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::reader::CsvMetadata;
+<span class="kw">use </span>clap::Parser;
+
+<span class="doccomment">/// Command struct to hold the query, column name and output path
+
+</span><span class="attr">#[derive(Parser, Debug)]
+</span><span class="kw">pub struct </span>Command {
+    <span class="attr">#[clap(long)]
+    </span><span class="kw">pub </span>query: String,
+    <span class="attr">#[clap(long)]
+    </span><span class="kw">pub </span>column: String,
+    <span class="attr">#[clap(long)]
+    </span><span class="kw">pub </span>output_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[clap(subcommand)]
+    </span><span class="kw">pub </span>subcommand: Subcommand
+}
+
+<span class="doccomment">/// Subcommand enum to hold the different filtering functions
+
+</span><span class="attr">#[derive(Parser, Debug)]
+</span><span class="kw">pub enum </span>Subcommand {
+    <span class="attr">#[clap(about = <span class="string">"Unsafe data filtering function"</span>)]
+    </span>Anyfilter,
+    <span class="attr">#[clap(about = <span class="string">"Safe data filtering function, single column &amp; query matching"</span>)]
+    </span>Filter(CsvMetadata)
+}
+
 
 <span class="doccomment">/// Filtering module contains functions to filter data from a csv file
 </span><span class="kw">pub mod </span>filtering {
@@ -161,18 +218,20 @@
     /// 1,"a,b",2,3 -&gt; [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, csv_struct: <span class="kw-2">&amp;</span>CsvMetadata) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
+    </span><span class="kw">pub fn </span>filter(buffer: BufReader&lt;File&gt;, filter_command: <span class="kw-2">&amp;</span>Command, csv_struct: <span class="kw-2">&amp;</span>CsvMetadata) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::io::Error&gt; {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
         <span class="kw">let </span><span class="kw-2">mut </span>writer: Vec&lt;Vec&lt;String&gt;&gt; = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>column_index = <span class="number">0</span>;
-        <span class="kw">let </span>column = <span class="kw-2">&amp;</span>csv_struct.column;
+        <span class="kw">let </span>column = <span class="kw-2">&amp;</span>filter_command.column;
+        <span class="kw">let </span>query = <span class="kw-2">&amp;</span>filter_command.query;
+        <span class="kw">let </span>output_path = <span class="kw-2">&amp;</span>filter_command.output_path;
+
         <span class="macro">println!</span>(<span class="string">"Column: {}"</span>, column);
-        <span class="kw">let </span>query = <span class="kw-2">&amp;</span>csv_struct.query;
         <span class="macro">println!</span>(<span class="string">"Query: {}"</span>, query);
-        <span class="kw">let </span>output_path = <span class="kw-2">&amp;</span>csv_struct.output_path;
 
         <span class="kw">for </span>(index, line) <span class="kw">in </span>buffer.lines().enumerate() {
-            <span class="kw">if </span>index == <span class="number">0 </span>{
+            <span class="kw">if </span>index == <span class="number">0 </span>&amp;&amp; csv_struct.has_header{
                 <span class="comment">// find the column index
                 </span><span class="kw">match </span>line {
                     <span class="prelude-val">Ok</span>(header) =&gt; {
@@ -225,14 +284,17 @@
             file: path.to_str().unwrap().to_string(),
             delimiter: <span class="string">','</span>,
             has_header: <span class="bool-val">true</span>,
-            column_types: <span class="macro">vec!</span>[<span class="string">"string"</span>.to_string()],
-            query: <span class="string">'1'</span>.to_string(),
-            column: <span class="string">"val"</span>.to_string(),
+            column_types: <span class="macro">vec!</span>[<span class="string">"string"</span>.to_string()]
+        };
+        <span class="kw">let </span>filter_command = Command {
+            query: <span class="string">"1"</span>.to_string(),
+            column: <span class="string">"key"</span>.to_string(),
             output_path: <span class="prelude-val">None</span>,
+            subcommand: Subcommand::Filter(csv_handler.clone())
         };
         <span class="kw">let </span>file = std::fs::File::open(path).unwrap();
         <span class="kw">let </span>reader = BufReader::new(file);
-        <span class="kw">let </span>writer = filtering::filter(reader, <span class="kw-2">&amp;</span>csv_handler);
+        <span class="kw">let </span>writer = filtering::filter(reader, <span class="kw-2">&amp;</span>filter_command, <span class="kw-2">&amp;</span>csv_handler);
         <span class="macro">assert!</span>(writer.is_ok());
     }
 }

@@ -6,6 +6,8 @@ use super::super::writer;
 use super::super::reader::CsvMetadata;
 use clap::Parser;
 
+/// Command struct to hold the query, column name and output path
+
 #[derive(Parser, Debug)]
 pub struct Command {
     #[clap(long)]
@@ -18,9 +20,13 @@ pub struct Command {
     pub subcommand: Subcommand
 }
 
+/// Subcommand enum to hold the different filtering functions
+
 #[derive(Parser, Debug)]
 pub enum Subcommand {
+    #[clap(about = "Unsafe data filtering function")]
     Anyfilter,
+    #[clap(about = "Safe data filtering function, single column & query matching")]
     Filter(CsvMetadata)
 }
 

@@ -43,12 +43,15 @@
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a></pre></div><pre class="rust"><code><span class="doccomment">//! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a></pre></div><pre class="rust"><code><span class="doccomment">//! Provide [CsvMetadata] struct and [csv_reader] function to read csv files
 </span><span class="kw">use </span>std::io::BufReader;
 <span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>clap::Parser;
 
-<span class="doccomment">/// A reader defines the struct containing metadata of the csv file
+<span class="doccomment">/// A reader module defines the struct containing metadata of the csv file
 /// # Example
 /// Build a CsvMetadata struct
 /// ```
@@ -57,30 +60,33 @@
 ///     file: "/path/to/file.csv".to_string(),
 ///     delimiter: ',',
 ///     has_header: true,
-///     column_types: vec!["string".to_string()],
-///     query: "".to_string(),
-///     column: "".to_string(),
-///     output_path: None,
+///     column_types: vec!["string".to_string()]
 /// };
 /// ```
 
 </span><span class="attr">#[derive(Parser, Debug)]
-#[clap(about = <span class="string">"Search for a pattern in a file and display the lines that contain it."</span>)]
+#[clap(about = <span class="string">"CSV constructur"</span>)]
 </span><span class="kw">pub struct </span>CsvMetadata {
     <span class="attr">#[clap(long)]
     </span><span class="kw">pub </span>file: String,
     <span class="attr">#[clap(long, default_value = <span class="string">","</span>)]
     </span><span class="kw">pub </span>delimiter: char,
-    <span class="attr">#[clap(long, action)]
+    <span class="attr">#[clap(long, action, default_value = <span class="string">"true"</span>)]
     </span><span class="kw">pub </span>has_header: bool,
     <span class="attr">#[clap(long, value_delimiter= <span class="string">','</span>, default_value = <span class="string">"string"</span>)]
     </span><span class="kw">pub </span>column_types: Vec&lt;String&gt;,
-    <span class="attr">#[clap(long, default_value = <span class="string">""</span>)]
-    </span><span class="kw">pub </span>query: String,
-    <span class="attr">#[clap(long, default_value = <span class="string">""</span>)]
-    </span><span class="kw">pub </span>column: String,
-    <span class="attr">#[clap(long, default_value = <span class="prelude-val">None</span>)]
-    </span><span class="kw">pub </span>output_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="kw">impl </span>CsvMetadata {
+    <span class="doccomment">/// Instanstiate `self` and return clone of the CsvMetadata struct
+    </span><span class="kw">pub fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CsvMetadata {
+        CsvMetadata {
+            file: <span class="self">self</span>.file.clone(),
+            delimiter: <span class="self">self</span>.delimiter,
+            has_header: <span class="self">self</span>.has_header,
+            column_types: <span class="self">self</span>.column_types.clone()
+        }
+    }
 }
 
 <span class="doccomment">/// Reads a csv file and returns a `BufReader&lt;File`
