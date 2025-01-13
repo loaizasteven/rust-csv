@@ -4,6 +4,32 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use super::super::writer;
 use super::super::reader::CsvMetadata;
+use clap::Parser;
+
+/// Command struct to hold the query, column name and output path
+
+#[derive(Parser, Debug)]
+pub struct Command {
+    #[clap(long)]
+    pub query: String,
+    #[clap(long)]
+    pub column: String,
+    #[clap(long)]
+    pub output_path: Option<String>,
+    #[clap(subcommand)]
+    pub subcommand: Subcommand
+}
+
+/// Subcommand enum to hold the different filtering functions
+
+#[derive(Parser, Debug)]
+pub enum Subcommand {
+    #[clap(about = "Unsafe data filtering function")]
+    Anyfilter,
+    #[clap(about = "Safe data filtering function, single column & query matching")]
+    Filter(CsvMetadata)
+}
+
 
 /// Filtering module contains functions to filter data from a csv file
 pub mod filtering {
@@ -42,18 +68,20 @@ pub mod filtering {
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
+    pub fn filter(buffer: BufReader<File>, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
         use super::*;
+
         let mut writer: Vec<Vec<String>> = Vec::new();
         let mut column_index = 0;
-        let column = &csv_struct.column;
+        let column = &filter_command.column;
+        let query = &filter_command.query;
+        let output_path = &filter_command.output_path;
+
         println!("Column: {}", column);
-        let query = &csv_struct.query;
         println!("Query: {}", query);
-        let output_path = &csv_struct.output_path;
 
         for (index, line) in buffer.lines().enumerate() {
-            if index == 0 {
+            if index == 0 && csv_struct.has_header{
                 // find the column index
                 match line {
                     Ok(header) => {
@@ -106,14 +134,17 @@ mod tests {
             file: path.to_str().unwrap().to_string(),
             delimiter: ',',
             has_header: true,
-            column_types: vec!["string".to_string()],
-            query: '1'.to_string(),
-            column: "val".to_string(),
+            column_types: vec!["string".to_string()]
+        };
+        let filter_command = Command {
+            query: "1".to_string(),
+            column: "key".to_string(),
             output_path: None,
+            subcommand: Subcommand::Filter(csv_handler.clone())
         };
         let file = std::fs::File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let writer = filtering::filter(reader, &csv_handler);
+        let writer = filtering::filter(reader, &filter_command, &csv_handler);
         assert!(writer.is_ok());
     }
 }

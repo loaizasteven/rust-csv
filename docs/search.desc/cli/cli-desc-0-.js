@@ -1,1 +1,1 @@
-searchState.loadedDescShard("cli", 0, "")
+searchState.loadedDescShard("cli", 0, "The CLI binary file is intended to be used by non-rustcean …\nCli enum to hold the different commands\nPlaceholder for additional cli commands\nCLI Transfrom entry point for CSV I/O operations, …\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nMain entry point for the CLI tool to read csv files and …")
