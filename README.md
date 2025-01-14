@@ -24,7 +24,7 @@ bash cargo_docs_shortcut.sh
 ## TODO
 - Add documentation to additional struct/enums
 - Add descriptions for commands/sub-commands in cli tool
-- Support for multi filtering
+- Support for multi filtering, OR operations
 - Warning when filtering causes empty csv - No output / Force output command
 - Add read me for use of cli (non-rust users)
 - shell script for users to download cli tool for local development (via `curl`)
@@ -34,8 +34,8 @@ bash cargo_docs_shortcut.sh
 - redesign of cli args, current initial command takes cli args and subcommand additional cli args. 
 ```bash
 ./cli transform \
-        --query "'1'" \
-        --column "val" \
+        --query 1,"'1'" \
+        --column key,val \
         --output-path "./test.csv" \
       filter \
         --file "../sdk/test/example/data.csv"
