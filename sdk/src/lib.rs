@@ -40,8 +40,8 @@ mod tests {
             column_types: vec!["string".to_string()]
         };
         let filter_command = data::manipulation::Command {
-            query: "1".to_string(),
-            column: "key".to_string(),
+            query: vec!["1".to_string()],
+            column: vec!["key".to_string()],
             output_path: None,
             subcommand: data::manipulation::Subcommand::Filter(csv_handler.clone())
         };

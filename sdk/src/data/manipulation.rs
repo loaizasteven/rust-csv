@@ -10,10 +10,10 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 pub struct Command {
-    #[clap(long)]
-    pub query: String,
-    #[clap(long)]
-    pub column: String,
+    #[clap(long, value_delimiter = ',')]
+    pub query: Vec<String>,
+    #[clap(long, value_delimiter = ',')]
+    pub column: Vec<String>,
     #[clap(long)]
     pub output_path: Option<String>,
     #[clap(subcommand)]
@@ -72,39 +72,44 @@ pub mod filtering {
         use super::*;
 
         let mut writer: Vec<Vec<String>> = Vec::new();
-        let mut column_index = 0;
-        let column = &filter_command.column;
-        let query = &filter_command.query;
+        let columns: &Vec<String> = &filter_command.column;
+        let queries: &Vec<String> = &filter_command.query;
         let output_path = &filter_command.output_path;
 
-        println!("Column: {}", column);
-        println!("Query: {}", query);
+        println!("Columns: {:?}", columns);
+        println!("Queries: {:?}", queries);
+
+        let mut column_indices = Vec::new();
 
         for (index, line) in buffer.lines().enumerate() {
-            if index == 0 && csv_struct.has_header{
-                // find the column index
+            if index == 0 && csv_struct.has_header {
+                // find the column indices
                 match line {
                     Ok(header) => {
-                        let col_option = header.split(',').position(|field| field.trim() == column);
-                        match col_option {
-                            Some(col) => {
-                                column_index = col;
-                                writer.push(vec![header]); 
-                            },
-                            None => {
-                                panic!("\x1b[0;31mRuntime Panic:\x1b[0m Column {} not found in the csv file", column);
+                        let headers: Vec<&str> = header.split(',').collect();
+                        for column in columns {
+                            match headers.iter().position(|&field| field.trim() == *column) {
+                                Some(col_index) => column_indices.push(col_index),
+                                None => panic!("\x1b[0;31mRuntime Panic:\x1b[0m Column {} not found in the csv file", column),
                             }
                         }
+                        writer.push(vec![header]);
                     }
                     Err(e) => return Err(e),
                 }
             } else {
                 match line {
-                    Ok(content) => {
-                        // Split the line by commas and check if any field matches the query
-
-                        if content.split(',').nth(column_index).unwrap().trim() == query {
-                            writer.push(vec![content]); // Add the whole line to the result
+                    Ok(record) => {
+                        let fields: Vec<&str> = record.split(',').collect();
+                        let mut match_all = true;
+                        for (col_index, query) in column_indices.iter().zip(queries) {
+                            if fields[*col_index].trim() != *query {
+                                match_all = false;
+                                break;
+                            }
+                        }
+                        if match_all {
+                            writer.push(vec![record]);
                         }
                     }
                     Err(e) => return Err(e),
@@ -137,8 +142,8 @@ mod tests {
             column_types: vec!["string".to_string()]
         };
         let filter_command = Command {
-            query: "1".to_string(),
-            column: "key".to_string(),
+            query: vec!["1".to_string()],
+            column: vec!["key".to_string()],
             output_path: None,
             subcommand: Subcommand::Filter(csv_handler.clone())
         };
