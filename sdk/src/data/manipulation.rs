@@ -66,6 +66,8 @@ pub mod filtering {
     /// This function will have undesired results if the csv elements contain commas within double quotes
     /// For example, due to the limitation of the split function, the following line will be split into 4 fields
     /// 1,"a,b",2,3 -> [1, "a, b", 2, 3]
+    /// 
+    /// Multi-Column filtering supports AND operation, i.e. all the queries must match all the respective columns;queries
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
     pub fn filter(buffer: BufReader<File>, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
