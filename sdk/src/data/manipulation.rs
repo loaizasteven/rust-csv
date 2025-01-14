@@ -25,7 +25,7 @@ pub struct Command {
 #[derive(Parser, Debug)]
 pub enum Subcommand {
     #[clap(about = "Unsafe data filtering function")]
-    Anyfilter,
+    Anyfilter(CsvMetadata),
     #[clap(about = "Safe data filtering function, single column & query matching")]
     Filter(CsvMetadata)
 }
@@ -42,18 +42,32 @@ pub mod filtering {
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    pub fn any_filter(buffer: BufReader<File>, query: &str) -> Result<String, std::io::Error> {
+    pub fn any_filter(buffer: BufReader<File>, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
         let mut writer = Vec::new();
-
-        for line in buffer.lines() {
-            match line {
-                Ok(content) => {
-                    // Split the line by commas and check if any field matches the query
-                    if content.split(',').any(|field| field.trim() == query) {
-                        writer.push(vec![content]); // Add the whole line to the result
+        let querys = &filter_command.query;
+        for (index, line) in buffer.lines().enumerate() {
+            if index == 0 && csv_struct.has_header {
+                match line {
+                    Ok(header) => {
+                        writer.push(vec![header]);
                     }
+                    Err(e) => return Err(e),
                 }
-                Err(e) => return Err(e),
+            } else{
+                match line {
+                    Ok(content) => {
+                        let mut match_all = true;
+                        for q in querys {
+                            // Split the line by commas and check if any field matches the query
+                            if content.split(',').any(|field| field.trim() == q) {}
+                            else{ match_all = false;}
+                        }
+                        if match_all {
+                            writer.push(vec![content]);
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
             }
         }
         Ok(String::from("SUCCESS"))

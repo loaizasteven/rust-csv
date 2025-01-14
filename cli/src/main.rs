@@ -67,7 +67,13 @@ fn main() {
                         &csv
                     )
                 },
-                _ => Err(std::io::Error::new(std::io::ErrorKind::Other, "Unknown subcommand")),
+                manipulation::Subcommand::Anyfilter(csv) => {
+                    manipulation::filtering::any_filter(
+                        sdk::reader::csv_reader(&csv),
+                        &filter,
+                        &csv
+                    )
+                }
             };
 
             response
