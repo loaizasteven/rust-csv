@@ -23,7 +23,6 @@ bash cargo_docs_shortcut.sh
 
 ## TODO
 - Add documentation to additional struct/enums
-- Add descriptions for commands/sub-commands in cli tool
 - Support for multi filtering, OR operations
 - Warning when filtering causes empty csv - No output / Force output command
 - Add read me for use of cli (non-rust users)

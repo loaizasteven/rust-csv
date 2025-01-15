@@ -10,11 +10,11 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 pub struct Command {
-    #[clap(long, value_delimiter = ',')]
+    #[clap(long, value_delimiter = ',', help = "Query to filter the data comma separated")]
     pub query: Vec<String>,
-    #[clap(long, value_delimiter = ',')]
+    #[clap(long, value_delimiter = ',', help = "Column name to filter the data comma separated")]
     pub column: Vec<String>,
-    #[clap(long)]
+    #[clap(long, help = "Output path for the filtered data")]
     pub output_path: Option<String>,
     #[clap(subcommand)]
     pub subcommand: Subcommand
