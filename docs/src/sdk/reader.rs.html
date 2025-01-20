@@ -237,18 +237,18 @@
     /// of the files will result in a misaligned data structure. In other words, there will be shifts to the schema of the data.
     /// 
     /// # Note
-    /// The [CsvMetadata::validate] function is a wrapper for two private functions **validate_extention** and **validate_multifile_header**
+    /// The [CsvMetadata::validate] function is a wrapper for two private functions **validate_extension** and **validate_multifile_header**
     /// If there are a large number of files, the validation process may take some time. This is caused by the need to read the headers of all files
     /// to check for consistency.
     /// 
     </span><span class="kw">pub fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>)-&gt; bool {
-        <span class="kw">if </span><span class="self">self</span>.validate_extention() &amp;&amp; <span class="self">self</span>.validate_multifile_header() {
+        <span class="kw">if </span><span class="self">self</span>.validate_extension() &amp;&amp; <span class="self">self</span>.validate_multifile_header() {
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">fn </span>validate_extention(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">fn </span>validate_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>ext = <span class="self">self</span>.file.split(<span class="string">'.'</span>).last().unwrap();
         <span class="kw">if </span>ext == <span class="string">"csv" </span>{
             <span class="kw">return </span><span class="bool-val">true</span>;
