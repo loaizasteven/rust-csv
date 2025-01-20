@@ -1,7 +1,7 @@
 //! Data Manipulation modules and functionalities
 
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{self, BufRead, BufReader};
 use super::super::writer;
 use super::super::reader::CsvMetadata;
 use clap::Parser;
@@ -30,6 +30,36 @@ pub enum Subcommand {
     Filter(CsvMetadata)
 }
 
+/// An iterator variant that yields strings or IO errors.
+/// 
+/// # Type Parameters
+/// 
+/// * `Item` - Each iteration produces a `Result<String, std::io::Error>`
+///
+/// The iterator is boxed to allow for dynamic dispatch.
+///
+pub enum FileRead {
+    Iterator(Box<dyn Iterator<Item = Result<String, std::io::Error>>>),
+    Reader(BufReader<File>)
+}
+
+/// impl block for the FileRead enum
+impl FileRead {
+    /// Returns an iterator over the lines of text within the file.
+    ///
+    /// # Returns
+    ///
+    /// Returns a boxed iterator that yields `Result<String, io::Error>` for each line.
+    /// The iterator handles both cases where `FileRead` is constructed from an existing iterator
+    /// or a direct file reader.
+    ///
+    pub fn lines(self) -> Box<dyn Iterator<Item = Result<String, io::Error>>> {
+        match self {
+            FileRead::Iterator(iter) => iter,
+            FileRead::Reader(reader) => Box::new(reader.lines())
+        }
+    }
+}
 
 /// Filtering module contains functions to filter data from a csv file
 pub mod filtering {
@@ -42,7 +72,7 @@ pub mod filtering {
     /// This function can potentially provide unexpected results if the query if there are multiple
     /// fields in a line that match the query. The first field that matches the query will be
     /// considered as a match.
-    pub fn any_filter(buffer: BufReader<File>, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
+    pub fn any_filter(buffer: FileRead, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
         let mut writer = Vec::new();
         let querys = &filter_command.query;
         for (index, line) in buffer.lines().enumerate() {
@@ -84,7 +114,7 @@ pub mod filtering {
     /// Multi-Column filtering supports AND operation, i.e. all the queries must match all the respective columns;queries
     /// # Panics
     /// This function will panic if the column name is not found in the csv file
-    pub fn filter(buffer: BufReader<File>, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
+    pub fn filter(buffer: FileRead, filter_command: &Command, csv_struct: &CsvMetadata) -> Result<String, std::io::Error> {
         use super::*;
 
         let mut writer: Vec<Vec<String>> = Vec::new();
@@ -146,7 +176,6 @@ pub mod filtering {
 mod tests {
     use super::*;
     use std::path::PathBuf;
-
     #[test]
     fn test_filtering() {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")); //crate root
@@ -164,7 +193,28 @@ mod tests {
             subcommand: Subcommand::Filter(csv_handler.clone())
         };
         let file = std::fs::File::open(path).unwrap();
-        let reader = BufReader::new(file);
+        let reader = FileRead::Reader(BufReader::new(file));
+        let writer = filtering::filter(reader, &filter_command, &csv_handler);
+        assert!(writer.is_ok());
+    }
+    
+    #[test]
+    fn test_glob_reader_filtering() {
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")); //crate root
+        path.push("test/*/*.csv");
+        let csv_handler = CsvMetadata {
+            file: path.to_str().unwrap().to_string(),
+            delimiter: ',',
+            has_header: true,
+            column_types: vec!["string".to_string()]
+        };
+        let filter_command = Command {
+            query: vec!["1".to_string()],
+            column: vec!["key".to_string()],
+            output_path: None,
+            subcommand: Subcommand::Filter(csv_handler.clone())
+        };
+        let reader = crate::reader::glob_reader(&csv_handler);
         let writer = filtering::filter(reader, &filter_command, &csv_handler);
         assert!(writer.is_ok());
     }

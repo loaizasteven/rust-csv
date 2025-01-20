@@ -18,6 +18,7 @@ rust-version = "1.83"
 [workspace.dependencies]
 # Add global dependencies used by all crates in the workspace
 clap = { version = "4.0", features = ["derive"] }
+glob = { version = "0.3.2"}
 
 [workspace.dependencies.sdk]
 path = "sdk/"

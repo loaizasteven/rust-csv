@@ -80,7 +80,13 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a></pre></div><pre class="rust"><code><span class="doccomment">//! The CLI binary file is intended to be used by non-rustcean developers to interact with the rust-csv library.
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a></pre></div><pre class="rust"><code><span class="doccomment">//! The CLI binary file is intended to be used by non-Rustaceans developers to interact with the rust-csv library.
 //! Specifically written for Data Scientist and Data Engineers using high-level programming languages such as Python or R.
 //! The CLI tool will allow users to read csv files and perform filtering operations, such as filtering by a specific column and query.
 //! This simple tool will reduct the I/O overhead of reading csv files and filtering data, reducing the time spent on data preprocessing.
@@ -144,12 +150,18 @@
             <span class="kw">let </span>response = <span class="kw">match </span>val {
                 manipulation::Subcommand::Filter(csv) =&gt; {
                     manipulation::filtering::filter(
-                        sdk::reader::csv_reader(<span class="kw-2">&amp;</span>csv),
+                        sdk::loader(<span class="kw-2">&amp;</span>csv),
                         <span class="kw-2">&amp;</span>filter,
                         <span class="kw-2">&amp;</span>csv
                     )
                 },
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(std::io::Error::new(std::io::ErrorKind::Other, <span class="string">"Unknown subcommand"</span>)),
+                manipulation::Subcommand::Anyfilter(csv) =&gt; {
+                    manipulation::filtering::any_filter(
+                        sdk::loader(<span class="kw-2">&amp;</span>csv),
+                        <span class="kw-2">&amp;</span>filter,
+                        <span class="kw-2">&amp;</span>csv
+                    )
+                }
             };
 
             response
