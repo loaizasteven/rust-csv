@@ -14,7 +14,12 @@ use data::manipulation::FileRead;
 
 /// Loader function that reads a csv file and returns a BufReader
 pub fn loader(csv_handler: &reader::CsvMetadata) -> FileRead {
-    return reader::csv_reader(csv_handler);
+    if csv_handler.file.contains("*"){
+        reader::glob_reader(csv_handler)
+    }
+    else {
+        reader::csv_reader(csv_handler)
+    }
 }
 
 #[cfg(test)]
