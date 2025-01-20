@@ -10,24 +10,18 @@ pub mod stdin_parser;
 pub mod data;
 pub mod writer;
 
-use std::io;
-
-use data::manipulation;
+use std::io::BufReader;
+use std::fs::File;
 
 /// Loader function that reads a csv file and returns a BufReader
-/// # Examples
-/// See the sdk_usage crate for an example of how to use this function
-pub fn loader(csv_handler: reader::CsvMetadata, filter_command: manipulation::Command) -> Result<(), io::Error> {
-    let reader = reader::csv_reader(&csv_handler);
-    let _ = manipulation::filtering::filter(reader, &filter_command, &csv_handler);
-
-    return Ok(())
+pub fn loader(csv_handler: &reader::CsvMetadata) -> BufReader<File> {
+    return reader::csv_reader(csv_handler);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
+    use std::{io::Read, path::PathBuf};
 
     #[test]
     fn test_loader() {
@@ -39,14 +33,10 @@ mod tests {
             has_header: true,
             column_types: vec!["string".to_string()]
         };
-        let filter_command = data::manipulation::Command {
-            query: "1".to_string(),
-            column: "key".to_string(),
-            output_path: None,
-            subcommand: data::manipulation::Subcommand::Filter(csv_handler.clone())
-        };
-        let result = super::loader(csv_handler, filter_command);
-        assert!(result.is_ok());
+        let mut result = super::loader(&csv_handler);
+        let mut buffer =[0; 3];
+        let _ = result.read(&mut buffer[..]);
+        assert!(buffer == [b'k', b'e', b'y']);
     }
 
 }

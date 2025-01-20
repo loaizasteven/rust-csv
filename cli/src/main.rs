@@ -62,12 +62,18 @@ fn main() {
             let response = match val {
                 manipulation::Subcommand::Filter(csv) => {
                     manipulation::filtering::filter(
-                        sdk::reader::csv_reader(&csv),
+                        sdk::loader(&csv),
                         &filter,
                         &csv
                     )
                 },
-                _ => Err(std::io::Error::new(std::io::ErrorKind::Other, "Unknown subcommand")),
+                manipulation::Subcommand::Anyfilter(csv) => {
+                    manipulation::filtering::any_filter(
+                        sdk::loader(&csv),
+                        &filter,
+                        &csv
+                    )
+                }
             };
 
             response
