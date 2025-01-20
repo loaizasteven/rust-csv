@@ -10,11 +10,10 @@ pub mod stdin_parser;
 pub mod data;
 pub mod writer;
 
-use std::io::BufReader;
-use std::fs::File;
+use data::manipulation::FileRead;
 
 /// Loader function that reads a csv file and returns a BufReader
-pub fn loader(csv_handler: &reader::CsvMetadata) -> BufReader<File> {
+pub fn loader(csv_handler: &reader::CsvMetadata) -> FileRead {
     return reader::csv_reader(csv_handler);
 }
 
@@ -33,10 +32,15 @@ mod tests {
             has_header: true,
             column_types: vec!["string".to_string()]
         };
-        let mut result = super::loader(&csv_handler);
+        let result = super::loader(&csv_handler);
         let mut buffer =[0; 3];
-        let _ = result.read(&mut buffer[..]);
-        assert!(buffer == [b'k', b'e', b'y']);
+        match result {
+            FileRead::Reader(mut reader) => {
+                let _ = reader.read(&mut buffer[..]);
+                assert!(buffer == [b'k', b'e', b'y']);
+            },
+            _ => panic!("Expected FileRead::Reader")
+        }
     }
 
 }

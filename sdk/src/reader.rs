@@ -3,6 +3,7 @@ use std::fs::File;
 use clap::Parser;
 use glob::glob;
 use std::io::{SeekFrom, Seek, BufRead, BufReader};
+use crate::data::manipulation::FileRead;
 
 /// A reader module defines the struct containing metadata of the csv file
 /// # Example
@@ -43,12 +44,12 @@ impl CsvMetadata {
 }
 
 /// Reads a csv file and returns a `BufReader<File`
-pub fn csv_reader(csv_struct: &CsvMetadata) -> BufReader<File> {
+pub fn csv_reader(csv_struct: &CsvMetadata) -> FileRead{
     let f = File::open(&csv_struct.file).expect("Error opening file");
-    BufReader::new(f)
+    FileRead::Reader(BufReader::new(f))
 }
 
-fn glob_reader(csv_struct: &CsvMetadata) -> impl Iterator<Item = Result<std::string::String, std::io::Error>>{
+pub fn glob_reader(csv_struct: &CsvMetadata) -> FileRead{
     let mut first_file:bool = true;
     let mut readers: Vec<BufReader<File>> = Vec::new();
     let mut pos: u64 = 0;
@@ -81,7 +82,7 @@ fn glob_reader(csv_struct: &CsvMetadata) -> impl Iterator<Item = Result<std::str
         }
     }
     // Combine the readers into a single iterator
-    return readers.into_iter().flat_map(|reader| reader.lines())
+    return FileRead::Iterator(Box::new(readers.into_iter().flat_map(|reader| reader.lines())))
 }
 
 #[cfg(test)]
@@ -101,6 +102,11 @@ mod tests {
         };
 
         let result = glob_reader(&csv_handler);
-        assert!(result.count() > 0);
+        match result {
+            FileRead::Iterator(iter) => {
+                assert!(iter.count() > 0);
+            },
+            _ => panic!("Expected FileRead::Iterator")
+        }
     }
 }
