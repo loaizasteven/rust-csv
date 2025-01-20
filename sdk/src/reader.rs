@@ -41,6 +41,63 @@ impl CsvMetadata {
             column_types: self.column_types.clone()
         }
     }
+
+    /// Validate the csv file based on the file extension and headers for multiple files
+    /// 
+    /// The [CsvMetadata] struct is validated based on the file extension matching the `*.csv` extention.
+    /// Additionally, for glob files the headers are validated to ensure that all files have the same headers. Otherwise, the concatenation
+    /// of the files will result in a misaligned data structure. In other words, there will be shifts to the schema of the data.
+    /// 
+    /// # Note
+    /// The [validate] function is a wrapper for two private functions [validate_extention] and [validate_multifile_header]
+    /// If there are a large number of files, the validation process may take some time. This is caused by the need to read the headers of all files
+    /// to check for consistency.
+    /// 
+    pub fn validate(&self)-> bool {
+        if self.validate_extention() && self.validate_multifile_header() {
+            return true;
+        }
+        return false;
+    }
+
+    fn validate_extention(&self) -> bool {
+        let ext = self.file.split('.').last().unwrap();
+        if ext == "csv" {
+            return true;
+        }
+        return false;
+    }
+
+    fn validate_multifile_header(&self) -> bool {
+        let mut header_list: Vec<String> = Vec::new();
+        if self.has_header {
+            for entry in glob(&self.file).expect("Failed to read glob pattern") {
+                match entry {
+                    Ok(path) => {
+                        let file_base: File = File::open(&path).expect("Error opening file");
+                        let mut reader = BufReader::new(file_base);
+                        let mut buffer: String = String::new();
+                        reader.read_line(&mut buffer).expect("Unable to read file to buffer");
+                        header_list.push(buffer);
+                    }
+                    Err(e) => eprintln!("{:?}", e),
+                }
+            }
+
+            let mut header_iter = header_list.iter();
+            let first_header = header_iter.next().unwrap();
+            for header in header_iter {
+                if first_header != header {
+                    return false
+                }
+            }
+            return true
+        }
+        else {
+            println!("No headers based on metadata");
+            return true
+        }
+    }
 }
 
 /// Reads a csv file and returns a `BufReader<File`
@@ -100,16 +157,19 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
 
-    #[test]
-    fn test_glob_reader_multiple_csv() {
+    fn constructer() -> CsvMetadata {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR")); //crate root
         path.push("test/*/*.csv");
-        let csv_handler = CsvMetadata {
+        return CsvMetadata {
             file: path.to_str().unwrap().to_string(),
             delimiter: ',',
             has_header: true,
             column_types: vec!["string".to_string()]
-        };
+        }
+    }
+    #[test]
+    fn test_glob_reader_multiple_csv() {
+        let csv_handler: CsvMetadata = constructer();
 
         let result = glob_reader(&csv_handler);
         match result {
@@ -118,5 +178,11 @@ mod tests {
             },
             _ => panic!("Expected FileRead::Iterator")
         }
+    }
+
+    #[test]
+    fn test_validation() {
+        let csv_handler: CsvMetadata = constructer();
+        assert!(csv_handler.validate());
     }
 }
