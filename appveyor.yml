@@ -18,6 +18,20 @@ environment:
     - TARGET: i686-pc-windows-msvc
     - TARGET: x86_64-pc-windows-msvc
 
+branches:
+  only:
+    - main  
+
+skip_commits:
+  files:
+    - README.md
+    - LICENSE
+    - CONTRIBUTING.md
+    - CODE_OF_CONDUCT.md
+    - PULL_REQUEST_TEMPLATE.md
+    - ISSUE_TEMPLATE.md
+    - appveyor.yml
+    
 install:
   - ps: >-
       If ($env:TARGET -eq 'x86_64-pc-windows-gnu') {
