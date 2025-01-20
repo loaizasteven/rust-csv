@@ -12,7 +12,7 @@ pub mod writer;
 
 use data::manipulation::FileRead;
 
-/// Loader function that reads a csv file and returns a BufReader
+/// Loader function that reads a csv file and returns a FileRead enum
 pub fn loader(csv_handler: &reader::CsvMetadata) -> FileRead {
     if csv_handler.file.contains("*"){
         reader::glob_reader(csv_handler)

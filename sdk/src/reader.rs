@@ -49,6 +49,16 @@ pub fn csv_reader(csv_struct: &CsvMetadata) -> FileRead{
     FileRead::Reader(BufReader::new(f))
 }
 
+/// Reads files matching the given glob pattern and returns an iterator over the contents of these files.
+/// 
+/// # Arguments
+///
+/// * `pattern` - A string slice that holds the glob pattern to match files.
+///
+/// # Returns
+///
+/// An iterator over the contents of the files that match the given glob pattern.
+///
 pub fn glob_reader(csv_struct: &CsvMetadata) -> FileRead{
     let mut first_file:bool = true;
     let mut readers: Vec<BufReader<File>> = Vec::new();

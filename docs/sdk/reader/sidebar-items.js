@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["csv_reader"],"struct":["CsvMetadata"]};
+window.SIDEBAR_ITEMS = {"fn":["csv_reader","glob_reader"],"struct":["CsvMetadata"]};

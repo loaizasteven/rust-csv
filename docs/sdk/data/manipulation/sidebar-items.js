@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Subcommand"],"mod":["filtering"],"struct":["Command"]};
+window.SIDEBAR_ITEMS = {"enum":["FileRead","Subcommand"],"mod":["filtering"],"struct":["Command"]};

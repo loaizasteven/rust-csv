@@ -30,13 +30,30 @@ pub enum Subcommand {
     Filter(CsvMetadata)
 }
 
+/// An iterator variant that yields strings or IO errors.
+/// 
+/// # Type Parameters
+/// 
+/// * `Item` - Each iteration produces a `Result<String, std::io::Error>`
+///
+/// The iterator is boxed to allow for dynamic dispatch.
+///
 pub enum FileRead {
     Iterator(Box<dyn Iterator<Item = Result<String, std::io::Error>>>),
     Reader(BufReader<File>)
 }
 
+/// impl block for the FileRead enum
 impl FileRead {
-    fn lines(self) -> Box<dyn Iterator<Item = Result<String, io::Error>>> {
+    /// Returns an iterator over the lines of text within the file.
+    ///
+    /// # Returns
+    ///
+    /// Returns a boxed iterator that yields `Result<String, io::Error>` for each line.
+    /// The iterator handles both cases where `FileRead` is constructed from an existing iterator
+    /// or a direct file reader.
+    ///
+    pub fn lines(self) -> Box<dyn Iterator<Item = Result<String, io::Error>>> {
         match self {
             FileRead::Iterator(iter) => iter,
             FileRead::Reader(reader) => Box::new(reader.lines())
