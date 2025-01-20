@@ -49,18 +49,18 @@ impl CsvMetadata {
     /// of the files will result in a misaligned data structure. In other words, there will be shifts to the schema of the data.
     /// 
     /// # Note
-    /// The [validate] function is a wrapper for two private functions [validate_extention] and [validate_multifile_header]
+    /// The [CsvMetadata::validate] function is a wrapper for two private functions **validate_extension** and **validate_multifile_header**
     /// If there are a large number of files, the validation process may take some time. This is caused by the need to read the headers of all files
     /// to check for consistency.
     /// 
     pub fn validate(&self)-> bool {
-        if self.validate_extention() && self.validate_multifile_header() {
+        if self.validate_extension() && self.validate_multifile_header() {
             return true;
         }
         return false;
     }
 
-    fn validate_extention(&self) -> bool {
+    fn validate_extension(&self) -> bool {
         let ext = self.file.split('.').last().unwrap();
         if ext == "csv" {
             return true;
